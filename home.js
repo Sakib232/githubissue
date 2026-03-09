@@ -1,4 +1,3 @@
-
 if (localStorage.getItem("isLoggedIn") !== "true") {
   window.location.href = "./login.html";
 }
@@ -121,28 +120,74 @@ function getPriorityBadge(priority) {
   return `<span class="text-[9px] font-semibold px-3 py-1 rounded-full bg-[#F1F3F5] text-[#9AA1A9]">N/A</span>`;
 }
 
-function getLabelBadges(label) {
-    if (!label || label.toLowerCase() === "no label") {
+function getLabelBadges(labelInput) {
+  const labels = Array.isArray(labelInput) ? labelInput : [labelInput];
+
+  const labelConfig = {
+    bug: {
+      bg: "bg-red-50",
+      text: "text-red-500",
+      border: "border border-red-200",
+      icon: "🚨",
+    },
+    enhancement: {
+      bg: "bg-green-50",
+      text: "text-green-500",
+      border: "border border-green-200",
+      icon: "✨",
+    },
+    "good first issue": {
+      bg: "bg-yellow-50",
+      text: "text-yellow-600",
+      border: "border border-yellow-200",
+      icon: "🏷️",
+    },
+    "help wanted": {
+      bg: "bg-yellow-50",
+      text: "text-yellow-600",
+      border: "border border-yellow-200",
+      icon: "🤝",
+    },
+    documentation: {
+      bg: "bg-blue-50",
+      text: "text-blue-500",
+      border: "border border-blue-200",
+      icon: "📘",
+    },
+    wontfix: {
+      bg: "bg-gray-50",
+      text: "text-gray-500",
+      border: "border border-gray-200",
+      icon: "⛔",
+    },
+  };
+
+  return labels
+    .map((label) => {
+      if (!label || label.toLowerCase() === "no label") {
         return `
-            <span class="text-[9px] font-semibold px-2 py-1 rounded-full bg-[#F4F5F7] text-[#9AA1A9]"># NO LABEL</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">
+            ⚪ NO LABEL
+          </span>
         `;
-    }
+      }
 
-    const l = label.toLowerCase();
+      const lowerLabel = label.toLowerCase();
+      const config = labelConfig[lowerLabel] || {
+        bg: "bg-indigo-50",
+        text: "text-indigo-500",
+        border: "border border-indigo-200",
+        icon: "🏷️",
+      };
 
-    if (l === "bug") {
-        return `<span class="text-[9px] font-semibold px-2 py-1 rounded-full bg-[#FDECEC] text-[#E96A6A]"># BUG</span>`;
-    }
-
-    if (l === "enhancement") {
-        return `<span class="text-[9px] font-semibold px-2 py-1 rounded-full bg-[#E9FBF1] text-[#19B36B]"># ENHANCEMENT</span>`;
-    }
-
-    if (l === "help wanted") {
-        return `<span class="text-[9px] font-semibold px-2 py-1 rounded-full bg-[#FFF4D6] text-[#D9A400]"># HELP WANTED</span>`;
-    }
-
-    return `<span class="text-[9px] font-semibold px-2 py-1 rounded-full bg-[#F4F5F7] text-[#9AA1A9]"># ${label.toUpperCase()}</span>`;
+      return `
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold uppercase ${config.bg} ${config.text} ${config.border}">
+          <span class="text-[10px]">${config.icon}</span>
+          <span>${label}</span>
+        </span>
+      `;
+    })
+    .join(" ");
 }
 
 function formatDate(dateString) {
@@ -167,7 +212,9 @@ function renderIssues(issues) {
       const status = issue.status || "Unknown";
       const author = issue.author || issue.createdBy || "Unknown";
       const priority = issue.priority || "N/A";
-      const label = issue.label || "No Label";
+      const label = issue.labels && issue.labels.length > 0 
+        ? issue.labels.join(", ") 
+        : "No Label";
       const createdAt = formatDate(issue.createdAt);
       const id = issue.id || issue._id;
 
@@ -328,3 +375,7 @@ async function handleSearch() {
 
 fetchAllIssues();
 setActiveTab("all");
+
+
+
+
