@@ -149,3 +149,69 @@ function formatDate(dateString) {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString();
 }
+
+function renderIssues(issues) {
+  issueCount.textContent = issues.length;
+
+  if (!issues.length) {
+    issuesContainer.innerHTML = `
+      <p class="col-span-full text-center text-gray-400 py-10">No issues found.</p>
+    `;
+    return;
+  }
+
+  issuesContainer.innerHTML = issues
+    .map((issue, index) => {
+      const title = issue.title || "No Title";
+      const description = issue.description || "No Description";
+      const status = issue.status || "Unknown";
+      const author = issue.author || issue.createdBy || "Unknown";
+      const priority = issue.priority || "N/A";
+      const label = issue.label || "No Label";
+      const createdAt = formatDate(issue.createdAt);
+      const id = issue.id || issue._id;
+
+      return `
+        <div
+          onclick="openIssueModal('${id}')"
+          class="bg-white rounded-xl border border-[#E9ECEF] border-t-[3px] ${getBorderColor(status)} shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between cursor-pointer min-h-fit"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-4 h-4 rounded-full flex items-center justify-center ${
+                status?.toLowerCase() === "open"
+                  ? "bg-[#E9FBF1]"
+                  : "bg-[#F3E8FF]"
+              }">
+                <div class="w-2 h-2 rounded-full ${
+                  status?.toLowerCase() === "open"
+                    ? "bg-[#19B36B]"
+                    : "bg-[#B26BFF]"
+                }"></div>
+              </div>
+
+              ${getPriorityBadge(priority)}
+            </div>
+
+            <h3 class="text-[13px] font-semibold leading-[16px] text-[#1F2937] mb-2 line-clamp-2">
+              ${title}
+            </h3>
+
+            <p class="text-[11px] leading-[14px] text-[#9CA3AF] mb-4 line-clamp-2">
+              ${description}
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+              ${getLabelBadges(label)}
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#F1F3F5] mt-auto">
+            <p class="text-[10px] text-[#9CA3AF] mb-1 line-clamp-1">#${index + 1} by ${author}</p>
+            <p class="text-[10px] text-[#9CA3AF]">${createdAt}</p>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
