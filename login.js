@@ -9,7 +9,7 @@ loginForm.addEventListener("submit", (e) => {
 
   if (username === "admin" && password === "admin123") {
     localStorage.setItem("isLoggedIn", "true");
-    window.location.href = "./main.html";
+    window.location.href = "./home.html";
   } else {
     loginError.textContent = "Invalid credentials. Use admin / admin123";
   }
