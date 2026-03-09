@@ -215,3 +215,57 @@ function renderIssues(issues) {
     })
     .join("");
 }
+
+async function openIssueModal(id) {
+  try {
+    const res = await fetch(`${BASE_URL}/issue/${id}`);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch single issue");
+    }
+
+    const data = await res.json();
+    const issue = data?.data || data;
+
+    modalContent.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">${issue.title || "No Title"}</h2>
+
+      <div class="flex flex-wrap gap-3 mb-5">
+        ${getStatusBadge(issue.status || "Unknown")}
+        ${getPriorityBadge(issue.priority || "N/A")}
+        ${getLabelBadges(issue.label || "No Label")}
+      </div>
+
+      <p class="text-gray-500 mb-6 leading-7">
+        ${issue.description || "No Description"}
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p><span class="font-semibold text-gray-700">Author:</span> ${issue.author || issue.createdBy || "Unknown"}</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p><span class="font-semibold text-gray-700">Created At:</span> ${formatDate(issue.createdAt)}</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p><span class="font-semibold text-gray-700">Status:</span> ${issue.status || "Unknown"}</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p><span class="font-semibold text-gray-700">Priority:</span> ${issue.priority || "N/A"}</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4 md:col-span-2">
+          <p><span class="font-semibold text-gray-700">Label:</span> ${issue.label || "No Label"}</p>
+        </div>
+      </div>
+    `;
+
+    modalOverlay.classList.remove("hidden");
+    modalOverlay.classList.add("flex");
+  } catch (error) {
+    showError("Failed to load issue details");
+  }
+}
