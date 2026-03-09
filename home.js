@@ -269,3 +269,62 @@ async function openIssueModal(id) {
     showError("Failed to load issue details");
   }
 }
+
+closeModal.addEventListener("click", () => {
+  modalOverlay.classList.add("hidden");
+  modalOverlay.classList.remove("flex");
+});
+
+modalOverlay.addEventListener("click", (e) => {
+  if (e.target === modalOverlay) {
+    modalOverlay.classList.add("hidden");
+    modalOverlay.classList.remove("flex");
+  }
+});
+
+tabButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentStatus = btn.dataset.status;
+    setActiveTab(currentStatus);
+    renderIssues(filterIssues(allIssues, currentStatus));
+  });
+});
+
+searchBtn.addEventListener("click", handleSearch);
+
+searchInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    handleSearch();
+  }
+});
+
+async function handleSearch() {
+  const query = searchInput.value.trim();
+
+  if (!query) {
+    renderIssues(filterIssues(allIssues, currentStatus));
+    return;
+  }
+
+  try {
+    showLoader();
+
+    const res = await fetch(`${BASE_URL}/issues/search?q=${encodeURIComponent(query)}`);
+
+    if (!res.ok) {
+      throw new Error("Search request failed");
+    }
+
+    const data = await res.json();
+    const searchedIssues = data?.data || data || [];
+
+    renderIssues(filterIssues(searchedIssues, currentStatus));
+  } catch (error) {
+    showError("Search failed. Please try again.");
+  } finally {
+    hideLoader();
+  }
+}
+
+fetchAllIssues();
+setActiveTab("all");
