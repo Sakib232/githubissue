@@ -2,7 +2,6 @@ if (localStorage.getItem("isLoggedIn") !== "true") {
   window.location.href = "./login.html";
 }
 
-// API base URL
 const API_BASE_URL = "https://phi-lab-server.vercel.app/api/v1/lab";
 
 const issuesGrid = document.getElementById("issuesContainer");
